@@ -9,7 +9,7 @@
                 <div class="mb-4">
                     <label for="body" class="sr-only">Body</label>
                     <textarea name="body" id="body" cols="30" rows="4" class="bg-gray-100
-                    border-2 w-full p-4 rounded-lg @error('body') border-red-500 @enderror"></textarea>
+                                border-2 w-full p-4 rounded-lg @error('body') border-red-500 @enderror"></textarea>
                 </div>
 
                 @error('body')
@@ -31,15 +31,32 @@
 
                         <p class="mb-2">{{ $post->body }}</p>
 
+                        @can('delete', $post)
+                        <form action="{{ route('posts.destroy', $post) }}" method="post" class="mr-1">
+                            @csrf
+                            @method('delete')
+                            <button type="submit" class="text-red-500">Delete</button>
+                        </form>
+                        @endcan
+
                         <div class="flex items-center">
-                            <form action="" method="post" class="mr-1">
-                                @csrf
-                                <button type="submit" class="text-blue-500">Like</button>
-                            </form>
-                            <form action="" method="post" class="mr-1">
-                                @csrf
-                                <button type="submit" class="text-blue-500">Unlike</button>
-                            </form>
+                            @auth
+                                @if (!$post->likedBy(auth()->user()))
+                                    <form action="{{ route('posts.likes', $post) }}" method="post" class="mr-1">
+                                        @csrf
+                                        <button type="submit" class="text-blue-500">Like</button>
+                                    </form>
+                                @else
+                                    <form action="{{ route('posts.likes', $post) }}" method="post" class="mr-1">
+                                        @csrf
+                                        @method('delete')
+                                        <button type="submit" class="text-blue-500">Unlike</button>
+                                    </form>
+
+                                @endif
+                            @endauth
+
+                            <span>{{ $post->likes->count() }} {{ Str::plural('like', $post->likes->count()) }} </span>
                         </div>
                     </div>
                 @endforeach
