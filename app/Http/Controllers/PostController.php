@@ -7,12 +7,24 @@ use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['auth'])->only(['store','destroy']);
+    }
+
     public function index()
     {
 
         $posts = Post::latest()->with(['user','likes'])->paginate(10);
         return view('posts.index',[
         'posts' => $posts,
+        ]);
+    }
+
+    public function shouw(Post $post)
+    {
+        return view('posts.show',[
+            'post'=>$post
         ]);
     }
 
